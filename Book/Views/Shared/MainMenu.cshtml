@@ -1,0 +1,19 @@
+﻿@using Book.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<UserModel> _signInManager
+@inject UserManager<UserModel> _UserManager
+@if (_signInManager.IsSignedIn(User) == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="User" asp-action="Profile" class="nav-link text-dark">โปรไฟล์</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a asp-controller="User" asp-action="Login" class="nav-link text-dark">เข้าสู่ระบบ</a>
+                        </li>
+                        <li class="nav-item">
+                        <a asp-controller="User" asp-action="Register" class="nav-link text-dark">สมัคสมาชิก</a>
+                        </li>
+                }
