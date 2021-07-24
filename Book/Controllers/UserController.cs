@@ -38,6 +38,7 @@ namespace Book.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterVm registerVm)
         {
+            
             if (ModelState.IsValid == false) return View(registerVm);
             try
             {

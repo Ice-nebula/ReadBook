@@ -20,9 +20,13 @@ namespace Book.Controllers
 
         public IActionResult Index()
         {
+            foreach (var k in HttpContext.Request.Headers.Keys)
+            {
+                _logger.LogInformation(HttpContext.Request.Headers[k]);
+            }
             return View();
         }
-
+       
         public IActionResult Privacy()
         {
             return View();

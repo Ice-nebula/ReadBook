@@ -3,8 +3,8 @@
     ViewData["Title"] = "สมัคสมาชิก";
     }
     <form asp-action="register" method="post">
-<div class="register-form">
         <div asp-validation-summary="ModelOnly" class="list-group-item-danger"></div>
+        <div class="register-form">
         <div class="form-group">
             <label asp-for="UserName" class="form-control"></label>
             <input asp-for="UserName" class="form-control" required />
@@ -28,5 +28,15 @@
         <style type="text/css">
         .register-form{
             background-color: pink;
+            width:200px;
+height:100px;
+padding:50px;
+position:relative;
+margin-right:auto;
+border: 3px solid blue;
             }
         </style>
+        @section sxcripts{
+            $(document).ready(function(){
+                }); //end document.ready
+            }
