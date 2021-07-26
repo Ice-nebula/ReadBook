@@ -1,4 +1,5 @@
 ﻿using Book.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -20,10 +21,7 @@ namespace Book.Controllers
 
         public IActionResult Index()
         {
-            foreach (var k in HttpContext.Request.Headers.Keys)
-            {
-                _logger.LogInformation(HttpContext.Request.Headers[k]);
-            }
+            
             return View();
         }
        

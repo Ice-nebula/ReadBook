@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Session;
+using Microsoft.AspNetCore.Http;
 using Book.Data;
 using Book.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -8,10 +11,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Book.Domain;
+using Book.Services;
 
 namespace Book
 {
@@ -27,6 +34,7 @@ namespace Book
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<ITokenService, TokenService>();
             services.AddAutoMapper(typeof(Startup));
             services.AddDbContext<DataContext>(d => d.UseSqlite(Configuration.GetConnectionString("sql")));
             services.AddIdentity<UserModel, IdentityRole>(i =>
@@ -36,7 +44,28 @@ namespace Book
                  i.Lockout.AllowedForNewUsers = true;
 
              }).AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
-           
+            services.AddSession(o =>
+            {
+                o.IdleTimeout = TimeSpan.FromMinutes(3);
+            });
+            var jwtSettings = Configuration.GetSection("JWTSettings");
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings["validIssuer"],
+                    ValidAudience = jwtSettings["validAudience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["securityKey"]))
+                };
+            });
             services.AddControllersWithViews();
         }
 
@@ -55,7 +84,16 @@ namespace Book
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseSession();
+            app.Use(async (context, nex) =>
+            {
+                var getToken = context.Session.GetString("token");
+                if (string.IsNullOrEmpty(getToken) == false)
+                {
+                    context.Request.Headers.Add("Authorization", "Bearer " + getToken);
+                } //end if.check token
+                await nex();
+            });
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

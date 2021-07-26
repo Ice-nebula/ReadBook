@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Book.Domain;
 using Book.Models;
 using Book.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,12 +17,13 @@ namespace Book.Controllers
         private readonly UserManager<UserModel> _userManager;
         private readonly SignInManager<UserModel> _signInManager;
         private readonly IMapper _mapper;
-
-        public UserController(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, IMapper mapper)
+        private readonly ITokenService _tokenService;
+        public UserController(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, IMapper mapper, ITokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
+            _tokenService = tokenService;
         }
         public IActionResult Register()
         {
@@ -76,18 +79,22 @@ namespace Book.Controllers
                     return View(loginVm);
                 }
                 var loginResault = await _signInManager.PasswordSignInAsync(queryUser, loginVm.Password, false, false);
-                if (loginResault.Succeeded == false)
+                if (loginResault.Succeeded)
                 {
-                    ModelState.AddModelError("", "ขอโทษค่ะ ไม่สามาถเข้าสู่ระบบได้ กรุณาลองใหม่ อีกครั้งนะคะ");
-                    return View();
-                } //end if
+                    var genToken = _tokenService.GetToken(queryUser);
+                    if (string.IsNullOrEmpty(genToken) == false)
+                    {
+                        HttpContext.Session.SetString("Token", genToken);
+                            }
+                    return RedirectToAction("Index", "Home");
+                }
             }
             catch (Exception e)
             {
                 ModelState.AddModelError("", e.Message);
                 return View();
             } //end catch
-            return RedirectToAction("Index", "Home");
+            return View(loginVm);
         } //end method.Login
     } //end class
 } //end name space
