@@ -89,5 +89,13 @@ namespace Book.Controllers
             } //end catch
             return RedirectToAction("Index", "Home");
         } //end method.Login
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        } //end method.Logout
     } //end class
 } //end name space
