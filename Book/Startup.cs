@@ -29,6 +29,7 @@ namespace Book
         {
             services.AddAutoMapper(typeof(Startup));
             services.AddDbContext<DataContext>(d => d.UseSqlite(Configuration.GetConnectionString("sql")));
+            
             services.AddIdentity<UserModel, IdentityRole>(i =>
              {
                  i.SignIn.RequireConfirmedEmail = false;
@@ -36,7 +37,10 @@ namespace Book
                  i.Lockout.AllowedForNewUsers = true;
 
              }).AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
-           
+            services.ConfigureApplicationCookie(c =>
+            {
+                c.LoginPath = "/user/login";
+            });
             services.AddControllersWithViews();
         }
 

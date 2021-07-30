@@ -64,7 +64,7 @@ namespace Book.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginVm loginVm)
+        public async Task<IActionResult> Login(LoginVm loginVm,string ReturnUrl = null)
         {
             try
             {
@@ -87,6 +87,7 @@ namespace Book.Controllers
                 ModelState.AddModelError("", e.Message);
                 return View();
             } //end catch
+            if (string.IsNullOrEmpty(ReturnUrl) == false) return Redirect(ReturnUrl);
             return RedirectToAction("Index", "Home");
         } //end method.Login
 

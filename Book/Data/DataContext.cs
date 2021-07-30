@@ -10,6 +10,8 @@ namespace Book.Data
 {
     public class DataContext : IdentityDbContext<UserModel>
     {
+        // DbSet
+        public DbSet<BookModel> Book { get; set; }
         public DataContext(DbContextOptions options) : base(options)
         {
         }

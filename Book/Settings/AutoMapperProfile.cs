@@ -14,6 +14,7 @@ namespace Book.Settings
         {
             CreateMap<UserModel, LoginVm>().ReverseMap();
             CreateMap<UserModel, RegisterVm>().ReverseMap();
+            CreateMap<BookModel, WriteBookVm>().ReverseMap();
         }
     }
 }
