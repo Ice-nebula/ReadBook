@@ -1,1 +1,83 @@
 ﻿@model WriteBookVm
+
+const { Swal } = require("../../wwwroot/lib/sweetalert2/dist/sweetalert2.all");
+
+const { Swal } = require("../../wwwroot/lib/sweetalert2/dist/sweetalert2.all");
+
+const { Swal } = require("../../wwwroot/lib/sweetalert2/dist/sweetalert2");
+<h1 class="text-center">เพิ่มนิยายเรื่องใหม่</h1>
+<form id ="FormBook" asp-action="Writer" method="post">
+<div class="form-book">
+<div class="row">
+<div class="col-4">
+<div class="form-group book-control">
+<label asp-for="BookName" class="form-control"></label>
+<input asp-for="BookName" class="form-control" required />
+</div>
+<div class="form-group book-control">
+<label asp-for="ShortDescription" class="form-control"></label>
+<input asp-for="ShortDescription" class="form-control" required />
+</div>
+<div class="form-group book-control">
+<label asp-for="Publish" class="form-control"></label>
+<input asp-for="Publish" class="form-control" />
+</div>
+<p>
+<input id="SubmitBook" class="btn btn-success" type="submit" value="เพิ่มหนังสือ" />
+</p>
+</div> @* end col *@
+</div>
+</div>
+</form>
+<style type="text/css">
+.form-book{
+    background-color:deeppink;
+    width:100px;
+height:120px;
+    border:2px solid gre;
+    }
+    .book-control{
+        background-color: deepskyblue;
+        width:70px;
+        height:70px;
+        border:2px solid deeppink;
+        }
+</style>
+@section Scripts{
+    <script>
+        $(document).ready(function(){
+      $("#FormBook").submit(function(event){
+var BookData = {
+    BookName: $("#BookName").val(),
+    ShortDescription: $("#ShortDescription").val(),
+    Publish:$("#Publish").val()
+    };
+          $.ajax({
+              type:"post",
+              data: BookData,
+              dataType:"json",
+              url:"@Url.Action("Writer")",
+              headers:{
+                  Authorization: "Bearer " + "@Context.Request.Cookies["AccessToken"]"
+                  },
+                  
+                  success:function(data,textStatus,xhr){
+
+                      console.log(textStatus + "ff " + xhr.status);
+                     
+                      },
+              error:function(e){
+                  if(e.status == 400){
+                     Swal.fire({
+                         title:"Error",
+                         text: e.responseJSON.message,
+                         background:"#ff0000"
+                         }); //end sweet alert
+                      } //end if
+                  }
+              });
+              event.preventDefault();
+          }); //end funtion.SubmitBook.click
+            }); //end page ready
+        </script>
+    } 

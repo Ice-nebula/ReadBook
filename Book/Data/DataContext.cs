@@ -12,6 +12,7 @@ namespace Book.Data
     {
         // DbSet
         public DbSet<BookModel> Book { get; set; }
+        public DbSet<BookCategoryModel> BookCategory { get; set; }
         public DataContext(DbContextOptions options) : base(options)
         {
         }

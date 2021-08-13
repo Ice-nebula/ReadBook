@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Book.Interfaces;
 using Book.Models;
 using Book.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,12 +17,13 @@ namespace Book.Controllers
         private readonly UserManager<UserModel> _userManager;
         private readonly SignInManager<UserModel> _signInManager;
         private readonly IMapper _mapper;
-
-        public UserController(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, IMapper mapper)
+        private readonly ITokenService _token;
+        public UserController(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, IMapper mapper, ITokenService token)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
+            _token = token;
         }
         public IActionResult Register()
         {
@@ -76,7 +79,12 @@ namespace Book.Controllers
                     return View(loginVm);
                 }
                 var loginResault = await _signInManager.PasswordSignInAsync(queryUser, loginVm.Password, false, false);
-                if (loginResault.Succeeded == false)
+                if (loginResault.Succeeded == true)
+                {
+                    var genToken = _token.GenerateToken(queryUser);
+                    HttpContext.Response.Cookies.Append("AccessToken", genToken);
+                }
+                else if (loginResault.Succeeded == false)
                 {
                     ModelState.AddModelError("", "ขอโทษค่ะ ไม่สามาถเข้าสู่ระบบได้ กรุณาลองใหม่ อีกครั้งนะคะ");
                     return View();
@@ -87,7 +95,6 @@ namespace Book.Controllers
                 ModelState.AddModelError("", e.Message);
                 return View();
             } //end catch
-            if (string.IsNullOrEmpty(ReturnUrl) == false) return Redirect(ReturnUrl);
             return RedirectToAction("Index", "Home");
         } //end method.Login
 
