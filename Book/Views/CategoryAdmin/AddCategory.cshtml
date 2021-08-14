@@ -1,0 +1,50 @@
+﻿@{
+    Layout = "~/Views/Shared/Admin/Layout.cshtml";
+    }
+<form id="bcForm" asp-controller="CategoryAdmin" asp-action="AddCategory" method="post">
+<div class="row">
+<div class="col-3">
+<div id="AlertSuccess"></div>
+<div class="form-group">
+<label for="CategoryName" class="form-control">ชื่อหมวดหมู่</label>
+<input name="CategoryName" id="CategoryName" class="form-control" required/>
+</div>
+<p>
+<input type="submit" class="btn-success" value="เพิ่มหมวดหมู่" />
+</p>
+</div>
+</div>
+</form>
+
+@section Scripts{
+    <script>
+        $(document).ready(function(){
+            $("#bcForm").submit(function(event){
+                var Data ={
+                    CategoryName: $("#CategoryName").val()
+                    }; //end data object
+                    $.ajax({
+                        type:"post",
+                        data:Data,
+                        dataType:"json",
+                        headers:{
+                            Authorization: "Bearer " + "@Context.Request.Cookies["AccessToken"]"
+                            },
+                            success:function(data,status,xhr){
+                                var html = "<div class=\"alert alert-success\" role=\"alert\"> "+xhr.responseJSON.message + "\</div>";
+     $("#AlertSuccess").empty();
+     $("#AlertSuccess").html(html);
+     $("#AlertSuccess").show();
+     
+                                },
+                                error:function(e){
+                                    if(e.status == 400){
+                                        AlertError(e.responseJSON.message);
+                                        } //end if
+                                    }
+                        }); //end ajax 
+                        event.preventDefault();
+                }); //end function.Submit form
+            }); //end function.ready
+        </script>
+    }

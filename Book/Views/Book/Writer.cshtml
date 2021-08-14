@@ -1,10 +1,4 @@
 ﻿@model WriteBookVm
-
-const { Swal } = require("../../wwwroot/lib/sweetalert2/dist/sweetalert2.all");
-
-const { Swal } = require("../../wwwroot/lib/sweetalert2/dist/sweetalert2.all");
-
-const { Swal } = require("../../wwwroot/lib/sweetalert2/dist/sweetalert2");
 <h1 class="text-center">เพิ่มนิยายเรื่องใหม่</h1>
 <form id ="FormBook" asp-action="Writer" method="post">
 <div class="form-book">
@@ -68,11 +62,7 @@ var BookData = {
                       },
               error:function(e){
                   if(e.status == 400){
-                     Swal.fire({
-                         title:"Error",
-                         text: e.responseJSON.message,
-                         background:"#ff0000"
-                         }); //end sweet alert
+      AlertError(e.responseJSON.message);               
                       } //end if
                   }
               });

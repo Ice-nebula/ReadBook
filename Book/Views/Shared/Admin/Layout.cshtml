@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin DashBoard</title>
+    <partial name="~/Views/Shared/Admin/Styled.cshtml" />
+</head>
+<style type="text/css">
+.body{
+    background-color:black;
+    }
+</style>
+<body class="body">
+<header>
+
+<partial name="~/Views/Shared/Admin/TopNavigation.cshtml" />
+</header>
+    <div class="container-fluid">
+        <main role="main" class="col-4">
+            @RenderBody()
+        </main>
+    </div>
+    <partial name="~/Views/Shared/Admin/Scripts.cshtml" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

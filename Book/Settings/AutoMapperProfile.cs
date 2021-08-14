@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Book.Models;
 using Book.ViewModels;
+using Book.ViewModels.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Book.Settings
             CreateMap<UserModel, LoginVm>().ReverseMap();
             CreateMap<UserModel, RegisterVm>().ReverseMap();
             CreateMap<BookModel, WriteBookVm>().ReverseMap();
+            CreateMap<BookCategoryModel, CategoryVm>().ReverseMap();
         }
     }
 }
