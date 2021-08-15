@@ -25,7 +25,7 @@ namespace Book.Controllers
         [Authorize]
         public async Task<IActionResult> ListCategory()
         {
-            var query = await _dataContext.BookCategory.ToListAsync();
+            var query = await _dataContext.BookCategory.AsNoTracking().ToListAsync();
             var map = _mapper.Map<IEnumerable<CategoryVm>>(query);
             var catvm = new CategoryManageVm();
             catvm.GetCategorys = map;
@@ -54,6 +54,24 @@ namespace Book.Controllers
             await _dataContext.BookCategory.AddAsync(bcn);
             await _dataContext.SaveChangesAsync();
             return Ok(new { Message = "เพิ่มหมวดหมู่ " + CategoryName + "สำเร็จ"});
-            }
-    }
+            } //end method
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCategory(CategoryManageVm categoryManageVm)
+        {
+            if (ModelState.IsValid == false) return View();
+            if (categoryManageVm.CatId.Length > 0)
+            {
+                foreach (var id in categoryManageVm.CatId)
+                {
+                    var query = await _dataContext.BookCategory.SingleOrDefaultAsync(x => x.Id == id);
+                    _dataContext.BookCategory.Remove(query);
+                } //end for
+                await _dataContext.SaveChangesAsync();
+                return RedirectToAction(nameof(ListCategory));
+            } //end if
+            return View();
+        }
+    } //end class
 }

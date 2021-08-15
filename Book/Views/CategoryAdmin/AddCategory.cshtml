@@ -2,7 +2,7 @@
     Layout = "~/Views/Shared/Admin/Layout.cshtml";
     }
 <form id="bcForm" asp-controller="CategoryAdmin" asp-action="AddCategory" method="post">
-<div class="row">
+<div class="row bcatForm">
 <div class="col-3">
 <div id="AlertSuccess"></div>
 <div class="form-group">
@@ -15,7 +15,16 @@
 </div>
 </div>
 </form>
-
+<style type="text/css">
+.bcatForm{
+    background-color:hotpink;
+    position:fixed;
+    top:auto;
+    right:100px;
+    left:auto;
+    bottom:200px;
+    }
+</style>
 @section Scripts{
     <script>
         $(document).ready(function(){

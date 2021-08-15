@@ -8,6 +8,6 @@ namespace Book.ViewModels.Admin
     public class CategoryManageVm
     {
         public IEnumerable<CategoryVm> GetCategorys { get; set; }
-        public int[] id { get; set; }
+        public int[] CatId { get; set; }
     }
 }
