@@ -1,45 +1,36 @@
-﻿@using Book.ViewModels.Admin
-@model CategoryManageVm
+﻿@model IEnumerable<GetCategoryMasterVm>
 @{
-    Layout = "~/Views/Shared/Admin/Layout.cshtml";
+    int[] ids;
     }
-<h1 class="text-center">หมวดหมู่ทั้งหมด</h1>
-<div class="Bcat">
-<form asp-action="DeleteCategory" method="post">
+<div class="list-bcat container">
+<h1 class="text-center">รายการหมวดหมู่ทั้งหมด</h1>
+<form asp-action="DeleteCategory"  id="bcatForm" method="post">
 <table class="table">
   <thead>
     <tr>
       <th scope="col">Id</th>
-      <th scope="col">ชื่อหมวดหมู่</th>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
     </tr>
   </thead>
   <tbody>
-      @foreach(var item in Model.GetCategorys)
+      @foreach(var item in Model)
       {
     <tr>
       <th scope="row">@item.Id</th>
-          <td>
-              <input type="checkbox" name="CatId" value="@item.Id" class="form-control" />
-              @item.CategoryName
-              </td>
-      </tr>
+      <td>
+          <label class="form-control">
+      <input type="checkbox"  id="ids" name="ids" value="@item.Id" />
+      @item.Name
+      </label>
+  </td>
+      <td>@item.Description</td>
+     </tr>
     }
   </tbody>
 </table>
 <p>
-<input type="submit" value="ลบหมวดหมู่" />
+<input type="submit" class="btn btn-success" value="ลบหมวดหมู่" />
 </p>
 </form>
 </div>
-<style type="text/css">
-.Bcat{
-    width: 200px;
-    background-color: hotpink;
-    height:auto;
-    position:fixed;
-    top:200px;
-    right:150px;
-    left:auto;
-    bottom:100px;
-    }
-</style>

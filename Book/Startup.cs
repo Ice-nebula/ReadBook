@@ -37,7 +37,7 @@ namespace Book
             services.AddSingleton(getJwt);
             services.AddScoped<ITokenService, TokenService>();
             services.AddAutoMapper(typeof(Startup));
-            services.AddDbContext<DataContext>(d => d.UseSqlite(Configuration.GetConnectionString("sql")));
+            services.AddDbContext<DataContext>(d => d.UseNpgsql(Configuration.GetConnectionString("psql")));
             
             services.AddIdentity<UserModel, IdentityRole>(i =>
              {

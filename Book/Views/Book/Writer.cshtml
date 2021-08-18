@@ -1,4 +1,7 @@
 ﻿@model WriteBookVm
+@{
+    var GetCategoryMaster = ViewData["GetCategoryMaster"] as IEnumerable<GetCategoryMasterVm>;
+    }
 <h1 class="text-center">เพิ่มนิยายเรื่องใหม่</h1>
 <form id ="FormBook" asp-action="Writer" method="post">
 <div class="form-book">
@@ -16,6 +19,21 @@
 <label asp-for="Publish" class="form-control"></label>
 <input asp-for="Publish" class="form-control" />
 </div>
+<p>
+<h1 class="text-center">เลือกหมวดหมู่</h1>
+                @if (GetCategoryMaster.Count() > 0)
+                {
+                    @foreach (var item in GetCategoryMaster)
+                    {
+                        <div class="form-group book-control">
+                        <label class="form-control">
+                        <input type="checkbox" class="form-control" id="bcat-1" name="CategoryId" value="@item.Id" />
+                        @item.Name
+                        </label>
+                        </div>
+                    }
+                }
+                </p>
 <p>
 <input id="SubmitBook" class="btn btn-success" type="submit" value="เพิ่มหนังสือ" />
 </p>

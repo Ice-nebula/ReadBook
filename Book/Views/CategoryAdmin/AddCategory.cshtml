@@ -1,59 +1,64 @@
-﻿@{
+﻿@model CategoryMasterVm
+
+@{
     Layout = "~/Views/Shared/Admin/Layout.cshtml";
     }
-<form id="bcForm" asp-controller="CategoryAdmin" asp-action="AddCategory" method="post">
-<div class="row bcatForm">
-<div class="col-3">
-<div id="AlertSuccess"></div>
-<div class="form-group">
-<label for="CategoryName" class="form-control">ชื่อหมวดหมู่</label>
-<input name="CategoryName" id="CategoryName" class="form-control" required/>
+    <div class="bcatForm">
+    <h1>เพิ่มหมวดหมู่</h1>
+    <form id="bcatForm" action="AddCategory" method="post">
+        <div id="AddBcatSuccess" class="alert alert-success" role="alert"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="form-control"></label>
+            <input asp-for="Name" class="form-control" required />
+            </div>
+            <div class="form-group">
+            <label asp-for="Description" class="form-control"></label>
+            <input asp-for="Description" class="form-control" required />
+            </div>
+            <p>
+                <input type="submit" class="btn btn-success"  value="เพิ่มหมวดหมู่"/>
+                </p>
+        </form>
 </div>
-<p>
-<input type="submit" class="btn-success" value="เพิ่มหมวดหมู่" />
-</p>
-</div>
-</div>
-</form>
 <style type="text/css">
 .bcatForm{
-    background-color:hotpink;
+    background-color:deeppink;
+    border: 3px solid blue;
+    width:150px;
+    height:100px;
     position:fixed;
     top:auto;
     right:100px;
     left:auto;
-    bottom:200px;
     }
 </style>
 @section Scripts{
     <script>
         $(document).ready(function(){
-            $("#bcForm").submit(function(event){
-                var Data ={
-                    CategoryName: $("#CategoryName").val()
+            $("#bcatForm").submit(function(event){
+                var getData = {
+                    Name:$("#Name").val(),
+                    Description:$("#Description").val()
                     }; //end data object
                     $.ajax({
                         type:"post",
-                        data:Data,
+                        data:getData,
                         dataType:"json",
                         headers:{
                             Authorization: "Bearer " + "@Context.Request.Cookies["AccessToken"]"
                             },
                             success:function(data,status,xhr){
-                                var html = "<div class=\"alert alert-success\" role=\"alert\"> "+xhr.responseJSON.message + "\</div>";
-     $("#AlertSuccess").empty();
-     $("#AlertSuccess").html(html);
-     $("#AlertSuccess").show();
-     
+                                var bcat = $("#AddBcatSuccess");
+                                bcat.empty();
+                                bcat.append(xhr.responseJSON.message);
+                                bcat.show();
                                 },
                                 error:function(e){
-                                    if(e.status == 400){
-                                        AlertError(e.responseJSON.message);
-                                        } //end if
+                                    AlertError(e.responseJSON.message);
                                     }
-                        }); //end ajax 
+                        }); //en
                         event.preventDefault();
-                }); //end function.Submit form
+                }); //end form.submit
             }); //end function.ready
         </script>
     }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Book.Data;
 using Book.Models;
-using Book.ViewModels.Admin;
+using Book.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,11 +25,9 @@ namespace Book.Controllers
         [Authorize]
         public async Task<IActionResult> ListCategory()
         {
-            var query = await _dataContext.BookCategory.AsNoTracking().ToListAsync();
-            var map = _mapper.Map<IEnumerable<CategoryVm>>(query);
-            var catvm = new CategoryManageVm();
-            catvm.GetCategorys = map;
-            return View(catvm);
+            var query = await _dataContext.CategoryMaster.AsNoTracking().ToListAsync();
+            var map = _mapper.Map<IEnumerable<GetCategoryMasterVm>>(query);
+            return View(map);
         }
         [HttpGet]
         public IActionResult AddCategory()
@@ -37,41 +35,35 @@ namespace Book.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> AddCategory(string CategoryName)
+        public async Task<IActionResult> AddCategory(CategoryMasterVm categoryMasterVm)
         {
-            if (string.IsNullOrEmpty(CategoryName) == true)
-            {
-                return BadRequest(new { message = "CategoryName can not be empty" });
-                } //end if
-            if (_dataContext.BookCategory.Any(x => x.CategoryName == CategoryName) == true)
+            if (ModelState.IsValid == false) return BadRequest();
+            if (_dataContext.CategoryMaster.Any(x => x.Name == categoryMasterVm.Name) == true)
             {
                 return BadRequest(new { message = "หมวดหมู่นี้มีอยู่ในระบบแล้ว" });
-            }
-            var bcn = new BookCategoryModel()
-            {
-                CategoryName = CategoryName
-            };
-            await _dataContext.BookCategory.AddAsync(bcn);
+            } //end if
+            CategoryMasterModel map = _mapper.Map<CategoryMasterModel>(categoryMasterVm);
+            await _dataContext.CategoryMaster.AddAsync(map);
             await _dataContext.SaveChangesAsync();
-            return Ok(new { Message = "เพิ่มหมวดหมู่ " + CategoryName + "สำเร็จ"});
+            return Ok(new { Message = "เพิ่มหมวดหมู่ " + "สำเร็จ"});
             } //end method
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteCategory(CategoryManageVm categoryManageVm)
+        public async Task<IActionResult> DeleteCategory(int[] ids)
         {
-            if (ModelState.IsValid == false) return View();
-            if (categoryManageVm.CatId.Length > 0)
+            if (ids.Length > 0)
             {
-                foreach (var id in categoryManageVm.CatId)
+                var deleteList = new List<CategoryMasterModel>();
+                foreach (var item in ids)
                 {
-                    var query = await _dataContext.BookCategory.SingleOrDefaultAsync(x => x.Id == id);
-                    _dataContext.BookCategory.Remove(query);
-                } //end for
+                    var query = await _dataContext.CategoryMaster.SingleOrDefaultAsync(x => x.Id == item);
+                    deleteList.Add(query);
+                } //end for each
+                _dataContext.CategoryMaster.RemoveRange(deleteList);
                 await _dataContext.SaveChangesAsync();
-                return RedirectToAction(nameof(ListCategory));
             } //end if
-            return View();
-        }
+            return RedirectToAction(nameof(ListCategory));
+        } //end method.Delete Category
     } //end class
 }

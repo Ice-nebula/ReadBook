@@ -20,7 +20,8 @@ namespace Book.Models
         [Required]
         public string ShortDescription { get; set; }
         public bool Publish { get; set; }
-        public DateTime DateCreated{get; set; }
+        public DateTime DateCreated { get; set; }
     public ICollection<BookChapterModel> bookChapters { get; set; }
+        public ICollection<BookCategoryModel> BookCategorys { get; set; } = new HashSet<BookCategoryModel>();
     }
 }

@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Book.ViewModels
 {
-    public class WriteBookVm
+    public class CategoryMasterVm
     {
         [Required]
-        public string BookName { get; set; }
+        public string Name { get; set; }
         [Required]
-        public string ShortDescription { get; set; }
-        public bool Publish { get; set; }
-        public int[] CategoryId { get; set; }
+        public string Description { get; set; }
     }
 }

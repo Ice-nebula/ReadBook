@@ -28,8 +28,11 @@ namespace Book.Controllers
         }
 
         [Authorize]
-        public IActionResult Writer()
+        public async Task<IActionResult> Writer()
         {
+            var queryBcat = await _dataContext.CategoryMaster.AsNoTracking().ToListAsync();
+            var map = _mapper.Map<IEnumerable<GetCategoryMasterVm>>(queryBcat);
+            ViewData["GetCategoryMaster"] = map;
             return View();
         }
 
