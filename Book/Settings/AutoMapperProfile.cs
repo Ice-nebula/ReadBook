@@ -17,6 +17,7 @@ namespace Book.Settings
             CreateMap<BookModel, WriteBookVm>().ReverseMap();
             CreateMap<CategoryMasterModel, CategoryMasterVm>().ReverseMap();
             CreateMap<CategoryMasterModel, GetCategoryMasterVm>().ReverseMap();
+            CreateMap<GetAllBooks, BookModel>().ReverseMap();
         }
     }
 }
