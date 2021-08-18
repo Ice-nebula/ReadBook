@@ -36,10 +36,8 @@
     <script>
         $(document).ready(function(){
             $("#bcatForm").submit(function(event){
-                var getData = {
-                    Name:$("#Name").val(),
-                    Description:$("#Description").val()
-                    }; //end data object
+                var getData =$("#bcatForm").serialize();
+                   
                     $.ajax({
                         type:"post",
                         data:getData,

@@ -47,10 +47,23 @@ namespace Book.Controllers
                 {
                     return BadRequest(new { Message = "นิยายเล่มนี้มีอยู่ในระบบแล้ว โปรดใช้ชื่ออื่นนะคะ" });
                 } //end if
+                if (writeBookVm.CategoryId.Length <= 0)
+                {
+                    return BadRequest(new { message = "โปรดเลือกหมวดหมู่ก่อนนะคะ" });
+                }
                 var map = _mapper.Map<BookModel>(writeBookVm);
 
                 map.Auther = User.Identity.Name;
                 map.DateCreated = DateTime.Now;
+                foreach (var item in writeBookVm.CategoryId)
+                {
+                    var query = await _dataContext.CategoryMaster.SingleOrDefaultAsync(x => x.Id == item);
+                    var catMap = new BookCategoryModel()
+                    {
+                        CategoryName = query.Name
+                    };
+                    map.BookCategorys.Add(catMap);
+                }
                 await _dataContext.Book.AddAsync(map);
                 await _dataContext.SaveChangesAsync();
                 return Ok(new { ResponseMessage = "ok" });

@@ -59,11 +59,8 @@ height:120px;
     <script>
         $(document).ready(function(){
       $("#FormBook").submit(function(event){
-var BookData = {
-    BookName: $("#BookName").val(),
-    ShortDescription: $("#ShortDescription").val(),
-    Publish:$("#Publish").val()
-    };
+var BookData = $("#FormBook").serialize();
+console.error(BookData);
           $.ajax({
               type:"post",
               data: BookData,
