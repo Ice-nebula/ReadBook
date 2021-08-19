@@ -1,0 +1,17 @@
+﻿.LightMode {
+    background-color: deepskyblue;
+    -webkit-transition: background 1s linear;
+    -moz-transition: background 1s linear;
+    -ms-transition: background 1s linear;
+    -o-transition: background 1.5s linear;
+    transition: background 1s linear;
+}
+
+.DarkMode {
+    background-color: black;
+    -webkit-transition: background 1s linear;
+    -moz-transition: background 1s linear;
+    -ms-transition: background 1s linear;
+    -o-transition: background 1.5s linear;
+    transition: background 1s linear;
+}
