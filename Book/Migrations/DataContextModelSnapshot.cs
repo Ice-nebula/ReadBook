@@ -61,13 +61,17 @@ namespace Book.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
                     b.HasIndex("Id", "Publish")
+                        .IsUnique();
+
+                    b.HasIndex("Title", "Publish")
                         .IsUnique();
 
                     b.ToTable("BookChapterModel");
@@ -80,8 +84,10 @@ namespace Book.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("Auther")
-                        .IsRequired()
+                    b.Property<int>("AutherId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("AutherId1")
                         .HasColumnType("text");
 
                     b.Property<string>("BookName")
@@ -95,12 +101,13 @@ namespace Book.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("ShortDescription")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("BookId");
 
-                    b.HasIndex("BookName", "BookId", "Publish", "DateCreated")
+                    b.HasIndex("AutherId1");
+
+                    b.HasIndex("Publish", "BookName")
                         .IsUnique();
 
                     b.ToTable("Book");
@@ -148,6 +155,9 @@ namespace Book.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MyBookId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -340,6 +350,15 @@ namespace Book.Migrations
                     b.Navigation("Book");
                 });
 
+            modelBuilder.Entity("Book.Models.BookModel", b =>
+                {
+                    b.HasOne("Book.Models.UserModel", "Auther")
+                        .WithMany("MyBook")
+                        .HasForeignKey("AutherId1");
+
+                    b.Navigation("Auther");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -396,6 +415,11 @@ namespace Book.Migrations
                     b.Navigation("BookCategorys");
 
                     b.Navigation("bookChapters");
+                });
+
+            modelBuilder.Entity("Book.Models.UserModel", b =>
+                {
+                    b.Navigation("MyBook");
                 });
 #pragma warning restore 612, 618
         }

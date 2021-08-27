@@ -10,7 +10,6 @@ namespace Book.Models
     {
         public int Id { get; set; }
         public string CategoryName { get; set; }
-        [ForeignKey(nameof(Book))]
         public int BookId{get; set; }
     public BookModel Book { get; set; }
 }

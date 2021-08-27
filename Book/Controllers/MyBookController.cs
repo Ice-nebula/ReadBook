@@ -4,11 +4,13 @@ using Book.Models;
 using Book.ViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Book.Controllers
@@ -17,10 +19,12 @@ namespace Book.Controllers
     {
         private readonly IMapper _mapper;
         private readonly DataContext _dataContext;
-        public MyBookController(IMapper mapper, DataContext dataContext)
+        private readonly UserManager<UserModel> _userManager;
+        public MyBookController(IMapper mapper, DataContext dataContext, UserManager<UserModel> userManager)
         {
             _mapper = mapper;
             _dataContext = dataContext;
+            _userManager = userManager;
         }
 
         [Authorize]
@@ -48,8 +52,6 @@ namespace Book.Controllers
                     return BadRequest(new { message = "โปรดเลือกหมวดหมู่ก่อนนะคะ" });
                 }
                 var map = _mapper.Map<BookModel>(writeBookVm);
-
-                map.Auther = User.Identity.Name;
                 map.DateCreated = DateTime.Now;
                 foreach (var item in writeBookVm.CategoryId)
                 {
@@ -60,8 +62,9 @@ namespace Book.Controllers
                     };
                     map.BookCategorys.Add(catMap);
                 }
-                await _dataContext.Book.AddAsync(map);
-                await _dataContext.SaveChangesAsync();
+                var queryUser = await _userManager.FindByIdAsync(writeBookVm.MyUserId);
+                queryUser.MyBook.Add(map);
+                await _userManager.UpdateAsync(queryUser);
                 return Ok(new { ResponseMessage = "ok" });
             }
             catch (Exception e)

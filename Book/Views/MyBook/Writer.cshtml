@@ -1,12 +1,17 @@
-﻿@model WriteBookVm
+﻿@using Microsoft.AspNetCore.Identity
+@using Book.Models
+@inject UserManager<UserModel> _userManager
+@model WriteBookVm
 @{
     var GetCategoryMaster = ViewData["GetCategoryMaster"] as IEnumerable<GetCategoryMasterVm>;
+var getUser = await _userManager.GetUserAsync(User);
     }
 <h1 class="text-center">เพิ่มนิยายเรื่องใหม่</h1>
 <form id ="FormBook" asp-action="Writer" method="post">
 <div class="form-book">
 <div class="row">
 <div class="col-4">
+<input type="hidden" asp-for="MyUserId" value="@getUser.Id"/>
 <div class="form-group book-control">
 <label asp-for="BookName" class="form-control"></label>
 <input asp-for="BookName" class="form-control" required />
@@ -85,7 +90,7 @@ console.error(BookData);
                       } //end if
                   }
               });
-              event.preventDefault();
+          event.preventDefault();
           }); //end funtion.SubmitBook.click
             }); //end page ready
         </script>

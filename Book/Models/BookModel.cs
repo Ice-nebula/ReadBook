@@ -8,16 +8,12 @@ using System.Threading.Tasks;
 
 namespace Book.Models
 {
-    [Index(nameof(BookName), nameof(BookId), nameof(Publish),nameof(DateCreated), IsUnique = true)]
     public class BookModel
     {
-        [Key]
         public int BookId { get; set; }
-        [Required]
         public string BookName { get; set; }
-        [Required]
-        public string Auther { get; set; }
-        [Required]
+public int AutherId{get; set; }
+        public UserModel Auther { get; set; }
         public string ShortDescription { get; set; }
         public bool Publish { get; set; }
         public DateTime DateCreated { get; set; }

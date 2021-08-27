@@ -8,5 +8,7 @@ namespace Book.Models
 {
     public class UserModel:IdentityUser
     {
+public int MyBookId{get; set; }
+        public ICollection<BookModel> MyBook { get; set; } = new HashSet<BookModel>();
     }
 }

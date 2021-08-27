@@ -30,7 +30,7 @@ namespace Book.Controllers
             var query = await _dataContext.Book.Where(x => x.Publish == true)
                 .Select(x => new GetAllBooks
                 {
-                    Auther = x.Auther,
+                    Auther = x.Auther.UserName,
                     BookName = x.BookName,
                     DateCreated = x.DateCreated
                 })

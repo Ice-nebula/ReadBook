@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Book.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20210815090721_Initial")]
-    partial class Initial
+    [Migration("20210827050832_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,10 +28,15 @@ namespace Book.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("BookId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("CategoryName")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookId");
 
                     b.ToTable("BookCategory");
                 });
@@ -58,13 +63,17 @@ namespace Book.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
                     b.HasIndex("Id", "Publish")
+                        .IsUnique();
+
+                    b.HasIndex("Title", "Publish")
                         .IsUnique();
 
                     b.ToTable("BookChapterModel");
@@ -77,8 +86,10 @@ namespace Book.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("Auther")
-                        .IsRequired()
+                    b.Property<int>("AutherId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("AutherId1")
                         .HasColumnType("text");
 
                     b.Property<string>("BookName")
@@ -92,15 +103,34 @@ namespace Book.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("ShortDescription")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("BookId");
 
-                    b.HasIndex("BookName", "BookId", "Publish", "DateCreated")
+                    b.HasIndex("AutherId1");
+
+                    b.HasIndex("Publish", "BookName")
                         .IsUnique();
 
                     b.ToTable("Book");
+                });
+
+            modelBuilder.Entity("Book.Models.CategoryMasterModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CategoryMaster");
                 });
 
             modelBuilder.Entity("Book.Models.UserModel", b =>
@@ -127,6 +157,9 @@ namespace Book.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MyBookId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -165,21 +198,6 @@ namespace Book.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("BookCategoryModelBookModel", b =>
-                {
-                    b.Property<int>("BookCategorysId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("booksBookId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("BookCategorysId", "booksBookId");
-
-                    b.HasIndex("booksBookId");
-
-                    b.ToTable("BookCategoryModelBookModel");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -312,6 +330,17 @@ namespace Book.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Book.Models.BookCategoryModel", b =>
+                {
+                    b.HasOne("Book.Models.BookModel", "Book")
+                        .WithMany("BookCategorys")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+                });
+
             modelBuilder.Entity("Book.Models.BookChapterModel", b =>
                 {
                     b.HasOne("Book.Models.BookModel", "Book")
@@ -323,19 +352,13 @@ namespace Book.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("BookCategoryModelBookModel", b =>
+            modelBuilder.Entity("Book.Models.BookModel", b =>
                 {
-                    b.HasOne("Book.Models.BookCategoryModel", null)
-                        .WithMany()
-                        .HasForeignKey("BookCategorysId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Book.Models.UserModel", "Auther")
+                        .WithMany("MyBook")
+                        .HasForeignKey("AutherId1");
 
-                    b.HasOne("Book.Models.BookModel", null)
-                        .WithMany()
-                        .HasForeignKey("booksBookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Auther");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -391,7 +414,14 @@ namespace Book.Migrations
 
             modelBuilder.Entity("Book.Models.BookModel", b =>
                 {
+                    b.Navigation("BookCategorys");
+
                     b.Navigation("bookChapters");
+                });
+
+            modelBuilder.Entity("Book.Models.UserModel", b =>
+                {
+                    b.Navigation("MyBook");
                 });
 #pragma warning restore 612, 618
         }

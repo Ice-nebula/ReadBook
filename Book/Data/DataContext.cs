@@ -1,4 +1,5 @@
 ﻿using Book.Models;
+using Book.Settings.EntityConfigurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,6 +17,14 @@ namespace Book.Data
         public DbSet<CategoryMasterModel> CategoryMaster { get; set; }
         public DataContext(DbContextOptions options) : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.ApplyConfiguration(new BookConfiguration());
+            builder.ApplyConfiguration(new UserConfiguration());
+            builder.ApplyConfiguration(new BookChapterConfiguration());
+            base.OnModelCreating(builder);
         }
     }
 }

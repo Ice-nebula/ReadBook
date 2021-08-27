@@ -13,6 +13,7 @@ namespace Book.ViewModels
         [Required]
         public string ShortDescription { get; set; }
         public bool Publish { get; set; }
+public string MyUserId{get; set; }
         public int[] CategoryId { get; set; }
     }
 }

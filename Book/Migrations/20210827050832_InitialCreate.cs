@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Book.Migrations
 {
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -27,6 +27,7 @@ namespace Book.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    MyBookId = table.Column<int>(type: "integer", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -48,33 +49,17 @@ namespace Book.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Book",
-                columns: table => new
-                {
-                    BookId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    BookName = table.Column<string>(type: "text", nullable: false),
-                    Auther = table.Column<string>(type: "text", nullable: false),
-                    ShortDescription = table.Column<string>(type: "text", nullable: false),
-                    Publish = table.Column<bool>(type: "boolean", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Book", x => x.BookId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BookCategory",
+                name: "CategoryMaster",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CategoryName = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookCategory", x => x.Id);
+                    table.PrimaryKey("PK_CategoryMaster", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,12 +169,56 @@ namespace Book.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Book",
+                columns: table => new
+                {
+                    BookId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    BookName = table.Column<string>(type: "text", nullable: false),
+                    AutherId = table.Column<int>(type: "integer", nullable: false),
+                    AutherId1 = table.Column<string>(type: "text", nullable: true),
+                    ShortDescription = table.Column<string>(type: "text", nullable: true),
+                    Publish = table.Column<bool>(type: "boolean", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Book", x => x.BookId);
+                    table.ForeignKey(
+                        name: "FK_Book_AspNetUsers_AutherId1",
+                        column: x => x.AutherId1,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookCategory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CategoryName = table.Column<string>(type: "text", nullable: true),
+                    BookId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookCategory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BookCategory_Book_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Book",
+                        principalColumn: "BookId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BookChapterModel",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: false),
+                    Title = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     Publish = table.Column<bool>(type: "boolean", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
@@ -203,30 +232,6 @@ namespace Book.Migrations
                         column: x => x.BookId,
                         principalTable: "Book",
                         principalColumn: "BookId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BookCategoryModelBookModel",
-                columns: table => new
-                {
-                    BookCategorysId = table.Column<int>(type: "integer", nullable: false),
-                    booksBookId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BookCategoryModelBookModel", x => new { x.BookCategorysId, x.booksBookId });
-                    table.ForeignKey(
-                        name: "FK_BookCategoryModelBookModel_Book_booksBookId",
-                        column: x => x.booksBookId,
-                        principalTable: "Book",
-                        principalColumn: "BookId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BookCategoryModelBookModel_BookCategory_BookCategorysId",
-                        column: x => x.BookCategorysId,
-                        principalTable: "BookCategory",
-                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -268,15 +273,20 @@ namespace Book.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Book_BookName_BookId_Publish_DateCreated",
+                name: "IX_Book_AutherId1",
                 table: "Book",
-                columns: new[] { "BookName", "BookId", "Publish", "DateCreated" },
+                column: "AutherId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Book_Publish_BookName",
+                table: "Book",
+                columns: new[] { "Publish", "BookName" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookCategoryModelBookModel_booksBookId",
-                table: "BookCategoryModelBookModel",
-                column: "booksBookId");
+                name: "IX_BookCategory_BookId",
+                table: "BookCategory",
+                column: "BookId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookChapterModel_BookId",
@@ -287,6 +297,12 @@ namespace Book.Migrations
                 name: "IX_BookChapterModel_Id_Publish",
                 table: "BookChapterModel",
                 columns: new[] { "Id", "Publish" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookChapterModel_Title_Publish",
+                table: "BookChapterModel",
+                columns: new[] { "Title", "Publish" },
                 unique: true);
         }
 
@@ -308,22 +324,22 @@ namespace Book.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "BookCategoryModelBookModel");
+                name: "BookCategory");
 
             migrationBuilder.DropTable(
                 name: "BookChapterModel");
 
             migrationBuilder.DropTable(
+                name: "CategoryMaster");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "BookCategory");
-
-            migrationBuilder.DropTable(
                 name: "Book");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }
